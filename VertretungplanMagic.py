@@ -83,7 +83,7 @@ def mergeFiles(dataDir):
                         continue
                     with open(tempFileName, 'rb') as readfile:
                         shutil.copyfileobj(readfile, outfile)
-        print("Files merged!!!")
+        print("Files merged in folder: " + dataDir)
 
 # Function: app Buttons
 
@@ -112,7 +112,6 @@ def btn_SchuelerMorgen(btnName):
 
 
 def btn_merge(btnName):
-    print(btnName)
     global tempLehrerHeute, tempLehrerMorgen
     tempLehrerHeute = app.getEntry("LehrerEnt")
     tempLehrerMorgen = app.getEntry("LehrerEnt2")
@@ -123,8 +122,7 @@ def btn_merge(btnName):
 def btn_cleanHtml(btnName):
     global tempLehrerHeute, tempLehrerMorgen
     if tempLehrerHeute != "":
-        cleanHTML = myHtmlParser(tempLehrerHeute, "all.html")
-        print(cleanHTML.getUpdate("Day"))
+        cleanHTML = myHtmlParser(tempLehrerHeute, "all.html")        
     if tempLehrerMorgen != "":
         cleanHTML = myHtmlParser(tempLehrerMorgen, "all.html")
 #
@@ -156,7 +154,7 @@ app.addLabel("SchuelerLab2", "Verzeichnis Schüler -> MORGEN:", 3, 0)
 app.addEntry("SchuelerEnt2", 3, 1)
 app.addNamedButton("ändern", "t_schueler2", btn_SchuelerMorgen, 3, 2)
 
-app.addNamedButton("test", "t_test", btn_merge, 5, 1)
+app.addNamedButton("merge Files", "t_test", btn_merge, 5, 1)
 app.addNamedButton("clean HTML", "t_clean", btn_cleanHtml, 6, 1)
 
 # read config file for input fields
