@@ -9,7 +9,7 @@ class myFtpUploader:
 
     tempFileName = ""
 
-    def __init__(self, directory, _tempFileName):
+    def __init__(self, finalDirectory, _tempFileName):
         server = 'ftp.strato.com'
         username = 'ftp_vertretungsplan@mittelschule-unterschleissheim.de'
         password = 'vertretungsplan125'

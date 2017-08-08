@@ -9,7 +9,7 @@ class myFtpUploader:
 
     tempFileName = ""
 
-    def __init__(self, directory, _tempFileName):
+    def __init__(self, finalDirectory, _tempFileName):
         server = 'server'
         username = 'username'
         password = 'password'
