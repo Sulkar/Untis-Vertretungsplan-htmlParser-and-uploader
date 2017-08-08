@@ -43,5 +43,9 @@ class myHtmlParser:
         with open(os.path.join(directory, "end_pretty.html"), "wb") as file:
             file.write(html_2)
 
+<<<<<<< HEAD
     def cleanHTML(self):
         return self.tempFileName
+=======
+    
+>>>>>>> ccdda7c0ace6269f12797cd22da5afe637b00009
