@@ -8,6 +8,7 @@ from configobj import ConfigObj
 
 # import my classes
 from classes.myHtmlParser import myHtmlParser
+from classes.myFtpUploader import myFtpUploader
 
 # Variables
 tempLehrerHeute = ""
@@ -117,11 +118,13 @@ def btn_merge(btnName):
         tempResult += "-> Files merged in folder: " + tempLehrerHeute + "\n"
         tempParse = myHtmlParser(tempLehrerHeute, "LehrerAllHeute.html")
         tempResult += "-> HTML cleaned: " + tempParse.cleanHTML() + "\n"
+        tempFtp = myFtpUploader("/data/Lehrer_heute/", "LehrerAllHeute.html")
     if tempLehrerMorgen != "":
         mergeFiles(tempLehrerMorgen, "LehrerAllMorgen.html")
         tempResult += "-> Files merged in folder: " + tempLehrerMorgen + "\n"
         tempParse = myHtmlParser(tempLehrerMorgen, "LehrerAllMorgen.html")
         tempResult += "-> HTML cleaned: " + tempParse.cleanHTML() + "\n"
+        tempFtp = myFtpUploader("/data/Lehrer_morgen/", "LehrerAllMorgen.html")
     #log infos
     app.clearTextArea("resultMsg", callFunction=False)
     app.setTextArea("resultMsg", tempResult, callFunction=False)
