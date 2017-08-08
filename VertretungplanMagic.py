@@ -81,10 +81,6 @@ def mergeFiles(dataDir, _tempFileName):
                         continue
                     with open(tempFileName, 'rb') as readfile:
                         shutil.copyfileobj(readfile, outfile)
-<<<<<<< HEAD
-=======
-        print("Files merged in folder: " + dataDir)
->>>>>>> ccdda7c0ace6269f12797cd22da5afe637b00009
 
 # Function: app Buttons
 def btn_LehrerHeute(btnName):
@@ -111,25 +107,18 @@ def btn_SchuelerMorgen(btnName):
 
 # Function: start (merge, HTML parser, FTP uploader)
 def btn_merge(btnName):
-<<<<<<< HEAD
     global tempLehrerHeute, tempLehrerMorgen, tempResult
     tempResult = ""
     # merge files and clean html
-=======
-    global tempLehrerHeute, tempLehrerMorgen
->>>>>>> ccdda7c0ace6269f12797cd22da5afe637b00009
     tempLehrerHeute = app.getEntry("LehrerEnt")
     tempLehrerMorgen = app.getEntry("LehrerEnt2")
 
     if tempLehrerHeute != "":
-<<<<<<< HEAD
         mergeFiles(tempLehrerHeute, "LehrerAllHeute.html")
         tempResult += "-> Files merged in folder: " + tempLehrerHeute + "\n"
         tempParse = myHtmlParser(tempLehrerHeute, "LehrerAllHeute.html")
         tempResult += "-> HTML cleaned: " + tempParse.cleanHTML() + "\n"
-=======
         cleanHTML = myHtmlParser(tempLehrerHeute, "all.html")        
->>>>>>> ccdda7c0ace6269f12797cd22da5afe637b00009
     if tempLehrerMorgen != "":
         mergeFiles(tempLehrerMorgen, "LehrerAllMorgen.html")
         tempResult += "-> Files merged in folder: " + tempLehrerMorgen + "\n"
@@ -160,19 +149,14 @@ app.addNamedButton("ändern", "t_schueler", btn_SchuelerHeute, 2, 2)
 app.addLabel("SchuelerLab2", "Verzeichnis Schüler -> MORGEN:", 3, 0)
 app.addEntry("SchuelerEnt2", 3, 1)
 app.addNamedButton("ändern", "t_schueler2", btn_SchuelerMorgen, 3, 2)
-<<<<<<< HEAD
 app.addHorizontalSeparator(4,0,3, colour="red")
 app.addNamedButton("MAGIC start!", "t_test", btn_merge, 5, 0, colspan=3)
 app.addHorizontalSeparator(7,0,3, colour="red")
 app.addLabel("messageLabel", "Result:", 8, 0, 3)
 app.addScrolledTextArea("resultMsg", 9, 0, colspan=3)
-#app.setTextAreaFg("resultMsg", "red")
 app.setTextAreaBg("resultMsg", "LightYellow")
-=======
-
 app.addNamedButton("merge Files", "t_test", btn_merge, 5, 1)
 app.addNamedButton("clean HTML", "t_clean", btn_cleanHtml, 6, 1)
->>>>>>> ccdda7c0ace6269f12797cd22da5afe637b00009
 
 # read config file for input fields
 readConf()
