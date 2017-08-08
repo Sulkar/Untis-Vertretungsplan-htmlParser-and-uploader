@@ -13,18 +13,14 @@ from bs4 import BeautifulSoup
 class myHtmlParser:
 
     soup = ""
+    tempFileName = ""
 
-    def __init__(self, directory, tempFileName):
+    def __init__(self, directory, _tempFileName):
 
-        fileName = os.path.join(directory, tempFileName)
+        self.tempFileName = _tempFileName
+        fileName = os.path.join(directory, _tempFileName)
         self.soup = BeautifulSoup(open(fileName), 'html.parser')
-
-        # save original html to prettified file
-        # or unicode(soup) for normal formatting
-        html_1 = self.soup.prettify("utf-8")
-        with open(os.path.join(directory, "start_pretty.html"), "wb") as file:
-            file.write(html_1)
-
+        
         # find all <head> and extract/remove it (head contains style and meta aswell)
         allHead = self.soup.find_all("head")
         for y in allHead:
@@ -47,4 +43,5 @@ class myHtmlParser:
         with open(os.path.join(directory, "end_pretty.html"), "wb") as file:
             file.write(html_2)
 
-    
+    def cleanHTML(self):
+        return self.tempFileName

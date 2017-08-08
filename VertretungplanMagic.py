@@ -2,10 +2,7 @@
 # Vertretungsplan merger - htmlParser - ftpUploader
 #
 
-import shutil
-import glob
-import os
-import sys
+import shutil, glob, os, sys
 from appJar import gui
 from configobj import ConfigObj
 
@@ -18,6 +15,7 @@ tempLehrerMorgen = ""
 tempSchuelerHeute = ""
 tempSchuelerMorgen = ""
 configFilename = "vertretungsplan.conf"
+tempResult = ""
 
 
 #
@@ -64,12 +62,12 @@ def readConf():
 # Function: merge files in current dataDir folder
 
 
-def mergeFiles(dataDir):
+def mergeFiles(dataDir, _tempFileName):
     if dataDir == "":
         print("Error no path available")
     else:
         # output Filename
-        outfilename = os.path.join(dataDir, "all.html")
+        outfilename = os.path.join(dataDir, _tempFileName)
 
         # open all .htm files and merge them to the outfilename
         with open(outfilename, 'wb') as outfile:
@@ -83,11 +81,8 @@ def mergeFiles(dataDir):
                         continue
                     with open(tempFileName, 'rb') as readfile:
                         shutil.copyfileobj(readfile, outfile)
-        print("Files merged in folder: " + dataDir)
 
 # Function: app Buttons
-
-
 def btn_LehrerHeute(btnName):
     _tempLehrerHeute = app.directoryBox(
         title="Lehrer Verzeichnis wählen:", dirName=None)
@@ -110,31 +105,32 @@ def btn_SchuelerMorgen(btnName):
     app.setEntry("SchuelerEnt2", _tempSchuelerMorgen, callFunction=True)
     writeConf(4, _tempSchuelerMorgen)
 
-
+# Function: start (merge, HTML parser, FTP uploader)
 def btn_merge(btnName):
-    global tempLehrerHeute, tempLehrerMorgen
+    global tempLehrerHeute, tempLehrerMorgen, tempResult
+    tempResult = ""
+    # merge files and clean html
     tempLehrerHeute = app.getEntry("LehrerEnt")
     tempLehrerMorgen = app.getEntry("LehrerEnt2")
-    mergeFiles(tempLehrerHeute)
-    mergeFiles(tempLehrerMorgen)
 
-
-def btn_cleanHtml(btnName):
-    global tempLehrerHeute, tempLehrerMorgen
     if tempLehrerHeute != "":
-        cleanHTML = myHtmlParser(tempLehrerHeute, "all.html")        
+        mergeFiles(tempLehrerHeute, "LehrerAllHeute.html")
+        tempResult += "-> Files merged in folder: " + tempLehrerHeute + "\n"
+        tempParse = myHtmlParser(tempLehrerHeute, "LehrerAllHeute.html")
+        tempResult += "-> HTML cleaned: " + tempParse.cleanHTML() + "\n"
     if tempLehrerMorgen != "":
-        cleanHTML = myHtmlParser(tempLehrerMorgen, "all.html")
-#
-# parse html
-#
+        mergeFiles(tempLehrerMorgen, "LehrerAllMorgen.html")
+        tempResult += "-> Files merged in folder: " + tempLehrerMorgen + "\n"
+        tempParse = myHtmlParser(tempLehrerMorgen, "LehrerAllMorgen.html")
+        tempResult += "-> HTML cleaned: " + tempParse.cleanHTML() + "\n"
+    #log infos
+    app.clearTextArea("resultMsg", callFunction=False)
+    app.setTextArea("resultMsg", tempResult, callFunction=False)
 
 
 #
 # gui with appJar -> at the end of file to call def´s
 #
-
-
 app = gui("Vertretungsplan Form")
 # app.setGeometry("400x300")
 app.setResizable(canResize=False)
@@ -146,23 +142,22 @@ app.addNamedButton("ändern", "t_lehrer", btn_LehrerHeute, 0, 2)
 app.addLabel("LehrerLab2", "Verzeichnis Lehrer -> MORGEN:", 1, 0)
 app.addEntry("LehrerEnt2", 1, 1)
 app.addNamedButton("ändern", "t_lehrer2", btn_LehrerMorgen, 1, 2)
-
 app.addLabel("SchuelerLab", "Verzeichnis Schüler -> HEUTE:", 2, 0)
 app.addEntry("SchuelerEnt", 2, 1)
 app.addNamedButton("ändern", "t_schueler", btn_SchuelerHeute, 2, 2)
 app.addLabel("SchuelerLab2", "Verzeichnis Schüler -> MORGEN:", 3, 0)
 app.addEntry("SchuelerEnt2", 3, 1)
 app.addNamedButton("ändern", "t_schueler2", btn_SchuelerMorgen, 3, 2)
-
-app.addNamedButton("merge Files", "t_test", btn_merge, 5, 1)
-app.addNamedButton("clean HTML", "t_clean", btn_cleanHtml, 6, 1)
+app.addHorizontalSeparator(4,0,3, colour="red")
+app.addNamedButton("MAGIC start!", "t_test", btn_merge, 5, 0, colspan=3)
+app.addHorizontalSeparator(7,0,3, colour="red")
+app.addLabel("messageLabel", "Result:", 8, 0, 3)
+app.addScrolledTextArea("resultMsg", 9, 0, colspan=3)
+#app.setTextAreaFg("resultMsg", "red")
+app.setTextAreaBg("resultMsg", "LightYellow")
 
 # read config file for input fields
 readConf()
 
 # start the GUI
 app.go()
-
-#
-# START
-#
