@@ -59,9 +59,8 @@ def readConf():
         app.setEntry("SchuelerEnt2", value4, callFunction=True)
     except:
         print("no Schüler value found")
+
 # Function: merge files in current dataDir folder
-
-
 def mergeFiles(dataDir, _tempFileName):
     if dataDir == "":
         print("Error no path available")
@@ -118,7 +117,6 @@ def btn_merge(btnName):
         tempResult += "-> Files merged in folder: " + tempLehrerHeute + "\n"
         tempParse = myHtmlParser(tempLehrerHeute, "LehrerAllHeute.html")
         tempResult += "-> HTML cleaned: " + tempParse.cleanHTML() + "\n"
-        cleanHTML = myHtmlParser(tempLehrerHeute, "all.html")        
     if tempLehrerMorgen != "":
         mergeFiles(tempLehrerMorgen, "LehrerAllMorgen.html")
         tempResult += "-> Files merged in folder: " + tempLehrerMorgen + "\n"
@@ -155,8 +153,6 @@ app.addHorizontalSeparator(7,0,3, colour="red")
 app.addLabel("messageLabel", "Result:", 8, 0, 3)
 app.addScrolledTextArea("resultMsg", 9, 0, colspan=3)
 app.setTextAreaBg("resultMsg", "LightYellow")
-app.addNamedButton("merge Files", "t_test", btn_merge, 5, 1)
-app.addNamedButton("clean HTML", "t_clean", btn_cleanHtml, 6, 1)
 
 # read config file for input fields
 readConf()
