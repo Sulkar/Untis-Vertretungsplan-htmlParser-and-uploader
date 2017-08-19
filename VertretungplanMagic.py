@@ -2,7 +2,7 @@
 # Vertretungsplan merger - htmlParser - ftpUploader
 #
 
-import shutil, os, sys, time, threading
+import shutil, os, sys, threading
 from tkinter import *
 from tkinter import filedialog, font
 from tkinter.ttk import Separator
@@ -17,6 +17,9 @@ tempLehrerHeute = ""
 tempLehrerMorgen = ""
 tempSchuelerHeute = ""
 tempSchuelerMorgen = ""
+tempServer = ""
+tempUsername = ""
+tempPassword = ""
 configFilename = "vertretungsplan.conf"
 tempResult = ""
 thisResult = ""
@@ -40,12 +43,19 @@ def writeConf(_fieldNr, _tempDir):
 
 # Functions: read Config file
 def readConf():
+    global tempServer, tempUsername, tempPassword, tempLehrerHeute, tempLehrerMorgen, tempSchuelerHeute, tempSchuelerMorgen
     config = ConfigObj(configFilename)
+    try:  # check if value Servername exists
+        tempServer = config['server']
+        tempUsername = config['username']
+        tempPassword = config['password']
+    except:
+        print("no FTP Server values found")
+
     try:  # check if value lehrer exists
         value1 = config['lehrerDirHeute']
         value1 = changeUmlauts(value1, 2)
         e1.insert(0, value1)
-        global tempLehrerHeute
         tempLehrerHeute = value1
     except:
         print("no Lehrer (heute) value found")
@@ -53,7 +63,6 @@ def readConf():
         value2 = config['lehrerDirMorgen']
         value2 = changeUmlauts(value2, 2)
         e2.insert(0, value2)
-        global tempLehrerMorgen
         tempLehrerMorgen = value2
     except:
         print("no Lehrer (morgen) value found")
@@ -61,7 +70,6 @@ def readConf():
         value3 = config['schuelerDirHeute']
         value3 = changeUmlauts(value3, 2)
         e3.insert(0, value3)
-        global tempSchuelerHeute
         tempSchuelerHeute = value3
     except:
         print("no Schüler (heute) value found")
@@ -69,7 +77,6 @@ def readConf():
         value4 = config['schuelerDirMorgen']
         value4 = changeUmlauts(value4, 2)
         e4.insert(0, value4)
-        global tempSchuelerMorgen
         tempSchuelerMorgen = value4
     except:
         print("no Schüler (morgen) value found")
@@ -136,7 +143,7 @@ def btn_start():
         text1.insert(INSERT, "-> LehrerAllHeute.html parsed!\n")
         root.update_idletasks() # updates the Tkinter form
         # 3. upload the HTML file to the server in a new thread
-        tempFtp1 = myFtpUploader()
+        tempFtp1 = myFtpUploader(tempServer, tempUsername, tempPassword)
         threadObj1 = threading.Thread(target=tempFtp1.uploadHTML, args=[tempLehrerHeute, "/data/Lehrer_heute/", "LehrerAllHeute.html"])
         threadObj1.start()
         threadObj2 = threading.Thread(target=checkThreads, args=[threadObj1, "-> LehrerAllHeute.html uploaded!\n"])
@@ -149,7 +156,7 @@ def btn_start():
         tempParse2.cleanHTML(tempLehrerMorgen, "LehrerAllMorgen.html")
         text1.insert(INSERT, "-> LehrerAllMorgen.html parsed!\n")
         root.update_idletasks() # updates the Tkinter form
-        tempFtp2 = myFtpUploader()
+        tempFtp2 = myFtpUploader(tempServer, tempUsername, tempPassword)
         # new threads for uploading and checking
         threadObj3 = threading.Thread(target=tempFtp2.uploadHTML, args=[tempLehrerMorgen, "/data/Lehrer_morgen/", "LehrerAllMorgen.html"])
         threadObj3.start()
@@ -162,7 +169,7 @@ def btn_start():
         tempParse3 = myHtmlParser()
         tempParse3.cleanHTML(tempSchuelerHeute, "SchuelerAllHeute.html")
         text1.insert(INSERT, "-> SchuelerAllHeute.html parsed!\n")
-        tempFtp3 = myFtpUploader()
+        tempFtp3 = myFtpUploader(tempServer, tempUsername, tempPassword)
         # new threads for uploading and checking
         threadObj5 = threading.Thread(target=tempFtp3.uploadHTML, args=[tempSchuelerHeute, "/data/Schueler_heute/", "SchuelerAllHeute.html"])
         threadObj5.start()
@@ -174,7 +181,7 @@ def btn_start():
         tempParse4 = myHtmlParser()
         tempParse4.cleanHTML(tempSchuelerMorgen, "SchuelerAllMorgen.html")
         text1.insert(INSERT, "-> SchuelerAllMorgen.html parsed!\n")
-        tempFtp4 = myFtpUploader()
+        tempFtp4 = myFtpUploader(tempServer, tempUsername, tempPassword)
         # new threads for uploading and checking
         threadObj7 = threading.Thread(target=tempFtp4.uploadHTML, args=[tempSchuelerMorgen, "/data/Schueler_morgen/", "SchuelerAllMorgen.html"])
         threadObj7.start()
