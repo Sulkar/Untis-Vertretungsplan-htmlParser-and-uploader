@@ -21,7 +21,6 @@ configFilename = "vertretungsplan.conf"
 tempResult = ""
 thisResult = ""
 
-print("hello \252")
 #
 # defs / functions
 #
