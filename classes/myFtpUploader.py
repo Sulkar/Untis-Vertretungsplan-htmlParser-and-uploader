@@ -18,10 +18,14 @@ class myFtpUploader:
 
 
     def uploadHTML(self, _sourceDir, _finalDir, _tempFileName):
-        ftp_connection = ftplib.FTP(self.server, self.username, self.password)
-        ftp_connection.cwd(_finalDir)
+        try:
+            ftp_connection = ftplib.FTP(self.server, self.username, self.password)
+            ftp_connection.cwd(_finalDir)
 
-        file = open(os.path.join(_sourceDir, _tempFileName), 'rb') # file to send
-        ftp_connection.storbinary('STOR ' + _tempFileName, file)     # send the file
-        file.close()                                    # close file and FTP
-        ftp_connection.quit()
+            file = open(os.path.join(_sourceDir, _tempFileName), 'rb') # file to send
+            ftp_connection.storbinary('STOR ' + _tempFileName, file)     # send the file
+            file.close()                                    # close file and FTP
+            ftp_connection.quit()
+            return "-> " + _tempFileName + " uploaded!\n"
+        except:
+            return "Error uploading " + _tempFileName + " !!! \n"
