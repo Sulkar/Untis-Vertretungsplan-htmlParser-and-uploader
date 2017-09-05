@@ -92,13 +92,13 @@ def mergeFiles(_dataDir, _tempFileName):
         with open(outfilename, 'wb') as outfile:
             for filename in os.listdir(_dataDir):
                 if filename.endswith(".htm"):
-                    tempFileName = os.path.join(
-                        _dataDir, filename)  # filename with _dataDir
+                    tempFileName = os.path.join(_dataDir, filename)  # filename with _dataDir
                     if tempFileName == outfilename:
                         # don't want to copy the output into the output
                         continue
                     with open(tempFileName, 'rb') as readfile:
                         shutil.copyfileobj(readfile, outfile)
+        updateTextArea("-> " + _tempFileName + " merged!\n", "")
 
 # Function: app Buttons
 def btn_LehrerHeute():
@@ -135,58 +135,33 @@ def btn_start():
     if tempLehrerHeute != "":
         # 1. merge all subst_00x files
         mergeFiles(tempLehrerHeute, "LehrerAllHeute.html")
-        text1.insert(INSERT, "-> LehrerAllHeute.html merged!\n")
-        root.update_idletasks() # updates the Tkinter form
-        # 2. delete all not needed HTML
+        # 2. delete all not needed HTML and add new id´s
         tempParse1 = myHtmlParser()
-        tempParse1.cleanHTML(tempLehrerHeute, "LehrerAllHeute.html")
-        text1.insert(INSERT, "-> LehrerAllHeute.html parsed!\n")
-        root.update_idletasks() # updates the Tkinter form
+        updateTextArea(tempParse1.cleanHTML(tempLehrerHeute, "LehrerAllHeute.html"), "")
         # 3. upload the HTML file to the server in a new thread
         tempFtp1 = myFtpUploader(tempServer, tempUsername, tempPassword)
-        threadObj1 = threading.Thread(target=tempFtp1.uploadHTML, args=[tempLehrerHeute, "/data/Lehrer_heute/", "LehrerAllHeute.html"])
-        threadObj1.start()
-        threadObj2 = threading.Thread(target=checkThreads, args=[threadObj1, "-> LehrerAllHeute.html uploaded!\n"])
-        threadObj2.start()
+        updateTextArea(tempFtp1.uploadHTML(tempLehrerHeute, "/data/Lehrer_heute/", "LehrerAllHeute.html"), "RED")
+
     if tempLehrerMorgen != "":
         mergeFiles(tempLehrerMorgen, "LehrerAllMorgen.html")
-        text1.insert(INSERT, "-> LehrerAllMorgen.html merged!\n")
-        root.update_idletasks() # updates the Tkinter form
         tempParse2 = myHtmlParser()
-        tempParse2.cleanHTML(tempLehrerMorgen, "LehrerAllMorgen.html")
-        text1.insert(INSERT, "-> LehrerAllMorgen.html parsed!\n")
-        root.update_idletasks() # updates the Tkinter form
+        updateTextArea(tempParse2.cleanHTML(tempLehrerMorgen, "LehrerAllMorgen.html"), "")
         tempFtp2 = myFtpUploader(tempServer, tempUsername, tempPassword)
-        # new threads for uploading and checking
-        threadObj3 = threading.Thread(target=tempFtp2.uploadHTML, args=[tempLehrerMorgen, "/data/Lehrer_morgen/", "LehrerAllMorgen.html"])
-        threadObj3.start()
-        threadObj4 = threading.Thread(target=checkThreads, args=[threadObj3, "-> LehrerAllMorgen.html uploaded!\n"])
-        threadObj4.start()
+        updateTextArea(tempFtp2.uploadHTML(tempLehrerMorgen, "/data/Lehrer_morgen/", "LehrerAllMorgen.html"), "RED")
 
     if tempSchuelerHeute != "":
         mergeFiles(tempSchuelerHeute, "SchuelerAllHeute.html")
-        text1.insert(INSERT, "-> SchuelerAllHeute.html merged!\n")
         tempParse3 = myHtmlParser()
-        tempParse3.cleanHTML(tempSchuelerHeute, "SchuelerAllHeute.html")
-        text1.insert(INSERT, "-> SchuelerAllHeute.html parsed!\n")
+        updateTextArea(tempParse3.cleanHTML(tempSchuelerHeute, "SchuelerAllHeute.html"), "")
         tempFtp3 = myFtpUploader(tempServer, tempUsername, tempPassword)
-        # new threads for uploading and checking
-        threadObj5 = threading.Thread(target=tempFtp3.uploadHTML, args=[tempSchuelerHeute, "/data/Schueler_heute/", "SchuelerAllHeute.html"])
-        threadObj5.start()
-        threadObj6 = threading.Thread(target=checkThreads, args=[threadObj5, "-> SchuelerAllHeute.html uploaded\n"])
-        threadObj6.start()
+        updateTextArea(tempFtp3.uploadHTML(tempSchuelerHeute, "/data/Schueler_heute/", "SchuelerAllHeute.html"), "RED")
+
     if tempSchuelerMorgen != "":
         mergeFiles(tempSchuelerMorgen, "SchuelerAllMorgen.html")
-        text1.insert(INSERT, "-> SchuelerAllMorgen.html merged!\n")
         tempParse4 = myHtmlParser()
-        tempParse4.cleanHTML(tempSchuelerMorgen, "SchuelerAllMorgen.html")
-        text1.insert(INSERT, "-> SchuelerAllMorgen.html parsed!\n")
+        updateTextArea(tempParse4.cleanHTML(tempSchuelerMorgen, "SchuelerAllMorgen.html"), "")
         tempFtp4 = myFtpUploader(tempServer, tempUsername, tempPassword)
-        # new threads for uploading and checking
-        threadObj7 = threading.Thread(target=tempFtp4.uploadHTML, args=[tempSchuelerMorgen, "/data/Schueler_morgen/", "SchuelerAllMorgen.html"])
-        threadObj7.start()
-        threadObj8 = threading.Thread(target=checkThreads, args=[threadObj7, "-> SchuelerAllMorgen.html uploaded\n"])
-        threadObj8.start()
+        updateTextArea(tempFtp4.uploadHTML(tempSchuelerMorgen, "/data/Schueler_morgen/", "SchuelerAllMorgen.html"), "RED")
 
 # Function: replaces umlauts and vice versa -> ü=ue, ...
 def changeUmlauts(_text, _type):
@@ -201,19 +176,15 @@ def changeUmlauts(_text, _type):
         _text=_text.replace('/ue', 'ü')
         return _text
 
-# Function: checks if thread is alive -> call Message when it´s dead
-def checkThreads(thread, tempMessage):
-    while thread.isAlive():
-        #print("alive")
-        pass
-    else:
-        text1.insert(INSERT, tempMessage, "RED")
-        text1.see("end") # scroll to the end of text in textfield
+# Function: insert messages for text1 - Tkinter
+def updateTextArea(tempMessage, tempColor):
+    text1.insert(INSERT, tempMessage, tempColor)
+    text1.see("end") # scroll to the end of text in textfield
+    root.update_idletasks() # updates the Tkinter form
 
 #
 # gui with appJar -> at the end of file
 #
-
 root = Tk()
 root.wm_title("Untis Vertretungsplan Parser - Version 1.0")
 root.resizable(False, False)
