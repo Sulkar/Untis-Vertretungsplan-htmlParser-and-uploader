@@ -49,3 +49,5 @@ class myHtmlParser:
         html_2 = str(soup).encode("utf-8")
         with open(os.path.join(_directory, _tempFileName), "wb") as file:
             file.write(html_2)
+
+        return "-> " + _tempFileName + " parsed!\n"
