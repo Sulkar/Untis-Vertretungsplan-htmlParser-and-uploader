@@ -2,7 +2,7 @@
 # Vertretungsplan merger - htmlParser - ftpUploader
 #
 
-import shutil, os, sys, threading
+import shutil, os, sys, time
 from tkinter import *
 from tkinter import filedialog, font
 from tkinter.ttk import Separator
@@ -55,6 +55,7 @@ def readConf():
     try:  # check if value lehrer exists
         value1 = config['lehrerDirHeute']
         value1 = changeUmlauts(value1, 2)
+        e1.delete(0, END)
         e1.insert(0, value1)
         tempLehrerHeute = value1
     except:
@@ -62,6 +63,7 @@ def readConf():
     try:  # check if value lehrer exists
         value2 = config['lehrerDirMorgen']
         value2 = changeUmlauts(value2, 2)
+        e2.delete(0, END)
         e2.insert(0, value2)
         tempLehrerMorgen = value2
     except:
@@ -69,6 +71,7 @@ def readConf():
     try:  # check if value schueler exists
         value3 = config['schuelerDirHeute']
         value3 = changeUmlauts(value3, 2)
+        e3.delete(0, END)
         e3.insert(0, value3)
         tempSchuelerHeute = value3
     except:
@@ -76,6 +79,7 @@ def readConf():
     try:  # check if value schueler exists
         value4 = config['schuelerDirMorgen']
         value4 = changeUmlauts(value4, 2)
+        e4.delete(0, END)
         e4.insert(0, value4)
         tempSchuelerMorgen = value4
     except:
@@ -83,22 +87,19 @@ def readConf():
 
 # Function: merge files in current _dataDir folder
 def mergeFiles(_dataDir, _tempFileName):
-    if _dataDir == "":
-        print("Error no path available")
-    else:
-        # output Filename
-        outfilename = os.path.join(_dataDir, _tempFileName)
-        # open all .htm files and merge them to the outfilename
-        with open(outfilename, 'wb') as outfile:
-            for filename in os.listdir(_dataDir):
-                if filename.endswith(".htm"):
-                    tempFileName = os.path.join(_dataDir, filename)  # filename with _dataDir
-                    if tempFileName == outfilename:
-                        # don't want to copy the output into the output
-                        continue
-                    with open(tempFileName, 'rb') as readfile:
-                        shutil.copyfileobj(readfile, outfile)
-        updateTextArea("-> " + _tempFileName + " merged!\n", "")
+    # output Filename
+    outfilename = os.path.join(_dataDir, _tempFileName)
+    # open all .htm files and merge them to the outfilename
+    with open(outfilename, 'wb') as outfile:
+        for filename in os.listdir(_dataDir):
+            if filename.endswith(".htm"):
+                tempFileName = os.path.join(_dataDir, filename)  # filename with _dataDir
+                if tempFileName == outfilename:
+                    # don't want to copy the output into the output
+                    continue
+                with open(tempFileName, 'rb') as readfile:
+                    shutil.copyfileobj(readfile, outfile)
+    updateTextArea("-> " + _tempFileName + " merged!\n", "")
 
 # Function: app Buttons
 def btn_LehrerHeute():
@@ -124,6 +125,8 @@ def btn_SchuelerMorgen():
 
 # Function: start (merge, HTML parser, FTP uploader)
 def btn_start():
+    # reread config -> if user changed it on runtime
+    readConf()
     global tempLehrerHeute, tempLehrerMorgen, tempSchuelerHeute, tempSchuelerMorgen, tempResult
     tempLehrerHeute = e1.get()
     tempLehrerMorgen = e2.get()
@@ -133,6 +136,8 @@ def btn_start():
     text1.delete(1.0, END)
 
     if tempLehrerHeute != "":
+        #create Timestamp file
+        createTimeStampFile()
         # 1. merge all subst_00x files
         mergeFiles(tempLehrerHeute, "LehrerAllHeute.html")
         # 2. delete all not needed HTML and add new id´s
@@ -163,6 +168,8 @@ def btn_start():
         tempFtp4 = myFtpUploader(tempServer, tempUsername, tempPassword)
         updateTextArea(tempFtp4.uploadHTML(tempSchuelerMorgen, "/data/Schueler_morgen/", "SchuelerAllMorgen.html"), "RED")
 
+    updateTextArea("-----------------------------------------------------------\n-> program finished!", "GREEN")
+
 # Function: replaces umlauts and vice versa -> ü=ue, ...
 def changeUmlauts(_text, _type):
     if _type == 1:
@@ -182,14 +189,32 @@ def updateTextArea(tempMessage, tempColor):
     text1.see("end") # scroll to the end of text in textfield
     root.update_idletasks() # updates the Tkinter form
 
+# Function: create and upload Timestamp text file
+def createTimeStampFile():
+    file = open(os.path.join(tempLehrerHeute, "timeStamp.txt"), "w")
+    file.write(time.strftime("%d.%m.%Y um %H:%M"))
+    file.close()
+    tempFtp = myFtpUploader(tempServer, tempUsername, tempPassword)
+    updateTextArea(tempFtp.uploadHTML(tempLehrerHeute, "/data/", "timeStamp.txt"), "RED")
+
+# Function: open config file with specified program (windows only?!?)
+def openConfig():
+    tempPath = os.path.join(os.path.dirname(__file__), "vertretungsplan.conf")
+    os.system('"' + tempPath + '"')
+
 #
 # gui with appJar -> at the end of file
 #
 root = Tk()
 root.wm_title("Untis Vertretungsplan Parser - Version 1.0")
 root.resizable(False, False)
+
 appHighlightFont = font.Font(family='Helvetica', size=12, weight='normal')
 root.option_add("*Font", appHighlightFont)
+
+# add menubar
+menubar = Menu(root,bg="red")
+menubar.add_cascade(label="update Config", command=openConfig)
 
 # add labels & entries in the correct row & column
 l1 = Label(root, text="Verzeichnis Lehrer -> HEUTE:")
@@ -220,7 +245,7 @@ e4.grid(row=3,column=1)
 b4 = Button(root, text = "ändern", command = btn_SchuelerMorgen)
 b4.grid(row=3,column=2)
 
-b5 = Button(root, text = "start parsing", command = btn_start)
+b5 = Button(root, text = "start program", command = btn_start)
 b5.grid(row=4,column=0,columnspan=3)
 sep1 = Separator(root, orient=HORIZONTAL)
 sep1.grid(row=5,column=0,columnspan=3,sticky="ew")
@@ -230,6 +255,7 @@ l5.grid(row=6,column=0,columnspan=3)
 text1 = Text(root, width=60, height=10)
 text1.grid(row=7,column=0, columnspan=3)
 text1.tag_config('RED', foreground='red')
+text1.tag_config('GREEN', foreground='green')
 
 l6 = Label(root, text="r.scheglmann@gmail.com")
 l6.grid(row=8,column=0,columnspan=3)
@@ -238,4 +264,5 @@ l6.grid(row=8,column=0,columnspan=3)
 readConf()
 
 # start the GUI
+root.config(menu=menubar)
 root.mainloop()
