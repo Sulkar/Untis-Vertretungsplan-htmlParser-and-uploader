@@ -1,6 +1,6 @@
 # Untis-Vertretungsplan-htmlParser-and-uploader
 
-Python program to merge, modify and upload http://untis.de/ HTML export for your own needs! After uploading you can use the changed files to display them with a [custom substitution website](/https://github.com/Sulkar/Untis-Vertretungsplan-custom-website)
+Python program to merge, modify and upload http://untis.de/ HTML export for your own needs! After uploading you can use the changed files to display them with a [custom substitution website](https://github.com/Sulkar/Untis-Vertretungsplan-custom-website)
 
 ![Alt text](/untisparser.png?raw=true "Program Python")
 
