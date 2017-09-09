@@ -7,9 +7,9 @@ Python program to merge, change and upload http://untis.de/ HTML export!
 ## Usage
 
 - click on "update Config" -> "vertretungsplan.conf" will open
-- add server = ..., username = ..., password = ...
+- add server = ..., username = ..., password = ... -> example: [vertretungsplan-example.conf](/vertretungsplan-example.conf)
 - Choose folder for teacher today, teacher tomorrow, student today and student tomorrow with "subst_001 - subst_n" data
-- click the "start program" button
+- click the "start program" button -> example: [tempUntisData](/tempUntisData/)
 
 -> the "subst_001 - subst_n" data in the folders come from the untis html export
 
