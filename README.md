@@ -5,4 +5,4 @@ Python script which does the following:
 - removes and adds some HTML tags with pythons beautiful soup HTML parser
 - uploads the final HTML files to a specific ftp server
 
-[[https://github.com/Sulkar/Untis-Vertretungsplan-htmlParser-and-uploader/blob/master/untisparser.png]]
+[[https://github.com/Sulkar/Untis-Vertretungsplan-htmlParser-and-uploader/blob/master/untisparser.png | alt=program ]]
