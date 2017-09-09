@@ -6,4 +6,4 @@ Python script which does the following:
 - uploads the final HTML files to a specific ftp server
 
 
-![Alt text](/blob/master/untisparser.png?raw=true "Optional Title")
+![Alt text](/untisparser.png?raw=true "Optional Title")
