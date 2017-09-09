@@ -1,6 +1,6 @@
 # Untis-Vertretungsplan-htmlParser-and-uploader
 
-Python program to merge, change and upload http://untis.de/ HTML export!
+Python program to merge, modify and upload http://untis.de/ HTML export for your own needs! After uploading you can use the changed files to display them with a [custom substitution website](/https://github.com/Sulkar/Untis-Vertretungsplan-custom-website)
 
 ![Alt text](/untisparser.png?raw=true "Program Python")
 
@@ -15,6 +15,8 @@ Python program to merge, change and upload http://untis.de/ HTML export!
 
 ## Function
 The program gets all "subst_001 - subst_n" data in the specified folder and do the following:
-- merge all files in the folder to one file i.e.: "LehrerAllHeute.html"
+- merge all files in folder to one file i.e.: "LehrerAllHeute.html"
 - change the html of the file to remove styles and some tags which aren´t needed -> see: [myHtmlParser.py](/classes/myHtmlParser.py)
 - add some specific ID´s, which are needed for displaying the data correctly on the "https://github.com/Sulkar/Untis-Vertretungsplan-custom-website" website
+- create a timeStamp.txt file with the current date and time
+- upload all merged files and the timeStamp file to the specified ftp-server
