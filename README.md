@@ -20,3 +20,9 @@ The program gets all "subst_001 - subst_n" data in the specified folder and do t
 - add some specific ID´s, which are needed for displaying the data correctly on the "https://github.com/Sulkar/Untis-Vertretungsplan-custom-website" website
 - create a timeStamp.txt file with the current date and time
 - upload all merged files and the timeStamp file to the specified ftp-server
+
+## Build .exe with PyInstaller http://www.pyinstaller.org/
+- (October 2017) PyInstaller works with Python 2.7 and 3.3—3.6
+- use it in the directory of VertretungplanMagic.py with: "pyinstaller pyVertretungplanMagic.py"
+- sometimes you need a shorter name to get PyInstaller to work -> i renamed VertretungsplanMagic.py to test.py
+- all the data needed is in the "dist" folder
