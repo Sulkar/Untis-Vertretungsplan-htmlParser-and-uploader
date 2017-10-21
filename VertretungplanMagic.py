@@ -87,6 +87,8 @@ def readConf():
 
 # Function: merge files in current _dataDir folder
 def mergeFiles(_dataDir, _tempFileName):
+    # store files creation date
+    tempTime = 0
     # output Filename
     outfilename = os.path.join(_dataDir, _tempFileName)
     # open all .htm files and merge them to the outfilename
@@ -97,6 +99,18 @@ def mergeFiles(_dataDir, _tempFileName):
                 if tempFileName == outfilename:
                     # don't want to copy the output into the output
                     continue
+                # check creation time of the file (minutes) and merge only files created at the "same" time
+                tempCreateTime = os.path.getctime(tempFileName)
+                tempCreateMin = int(time.strftime("%M", time.gmtime(tempCreateTime)))
+                if tempTime == 0:
+                    tempTime = tempCreateMin
+                    print("init tempTime with " + tempFileName)
+                elif tempCreateMin == tempTime or tempCreateMin == tempTime + 1: # if file has the same time or same time +1 -> merge
+                    print("merge " + tempFileName)
+                else:
+                    print("no merge " + tempFileName)
+                    continue
+
                 with open(tempFileName, 'rb') as readfile:
                     shutil.copyfileobj(readfile, outfile)
     updateTextArea("-> " + _tempFileName + " merged!\n", "")
