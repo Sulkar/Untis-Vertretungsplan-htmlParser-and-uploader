@@ -27,5 +27,5 @@ class myFtpUploader:
             file.close()                                    # close file and FTP
             ftp_connection.quit()
             return "-> " + _tempFileName + " uploaded!\n"
-        except:
-            return "Error uploading " + _tempFileName + " !!! \n"
+        except Exception as e:
+            return "Error uploading " + _tempFileName + " !!! \n -> " + str(e) + "\n"
