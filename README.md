@@ -21,6 +21,11 @@ The program gets all "subst_001 - subst_n" data in the specified folder and do t
 - create a timeStamp.txt file with the current date and time
 - upload all merged files and the timeStamp file to the specified ftp-server
 
+## Dependencies
+You need to pip install:
+- "pip install configobj"
+- "pip install beautifulsoup4"
+
 ## Build .exe with PyInstaller http://www.pyinstaller.org/
 - (October 2017) PyInstaller works with Python 2.7 and 3.3—3.6
 - use it in the directory of VertretungplanMagic.py with: "pyinstaller pyVertretungplanMagic.py"
