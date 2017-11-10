@@ -220,7 +220,7 @@ def openConfig():
 # gui with appJar -> at the end of file
 #
 root = Tk()
-root.wm_title("Untis Vertretungsplan Parser - Version 1.0")
+root.wm_title("Untis Vertretungsplan Parser - Version 1.3")
 root.resizable(False, False)
 
 appHighlightFont = font.Font(family='Helvetica', size=12, weight='normal')

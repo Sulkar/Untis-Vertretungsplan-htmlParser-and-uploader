@@ -37,11 +37,17 @@ class myHtmlParser:
             x.findNext("p").extract()
             x.findNext("p").extract()
 
-        # find <body> tags and rename them to <div id="tempDay">
+        # find <body> tags and rename them to <div id="tempDay"> if they are not empty
         tempBody = soup.find_all("body")
         for w in tempBody:
-            w.name = "div"
-            w["id"] = "tempDay"
+            tempEmpty = w.select('td.list.inline_header') # search for td with both classes
+            for empty in tempEmpty:
+                if empty.find(text=re.compile("-----")): # if text in this td is ------ do not rename body
+                    print("empty day not renaming -> delete it")
+                    w.extract() # remove empty days/body
+                else:
+                    w.name = "div"
+                    w["id"] = "tempDay"
 
         # save changed html to file
         # prettify("utf-8") or unicode(soup) for normal formatting
