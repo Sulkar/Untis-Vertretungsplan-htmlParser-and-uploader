@@ -42,7 +42,7 @@ class myHtmlParser:
         for w in tempBody:
             tempEmpty = w.select('td.list.inline_header') # search for td with both classes
             for empty in tempEmpty:
-                if empty.find(text=re.compile("-----")): # if text in this td is ------ do not rename body
+                if empty.find(text=re.compile("-----")) and len(tempEmpty) == 1: # if text in this td is ------ and it is the only td.list.inline_header -> do not rename body
                     print("empty day not renaming -> delete it")
                     w.extract() # remove empty days/body
                 else:
