@@ -28,6 +28,7 @@ You need to pip install:
 
 ## Build .exe with PyInstaller http://www.pyinstaller.org/
 - (October 2017) PyInstaller works with Python 2.7 and 3.3—3.6
-- use it in the directory of VertretungplanMagic.py with: "pyinstaller pyVertretungplanMagic.py"
-- sometimes you need a shorter name to get PyInstaller to work -> i renamed VertretungsplanMagic.py to test.py
+- use it in the directory of VertretungplanMagic.py with: "pyinstaller vertretungsplan.py"
+- Bug: only lower case names work with PyInstaller -> vertretungsplan.py
 - all the data needed is in the "dist" folder
+- add a new "vertretungsplan.conf" file to the folder so the program can write and save your configs
