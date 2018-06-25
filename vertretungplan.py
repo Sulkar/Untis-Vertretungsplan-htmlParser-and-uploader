@@ -1,5 +1,5 @@
 #
-# Vertretungsplan merger - htmlParser - ftpUploader
+# Vertretungsplan merger - htmlParser - ftpUploader - Version 1.4
 #
 
 import shutil, os, sys, time
@@ -86,11 +86,11 @@ def readConf():
         print("no Schüler (morgen) value found")
 
 # Function: merge files in current _dataDir folder
-def mergeFiles(_dataDir, _tempFileName):
+def mergeFiles(_dataDir, _tempFileName, _outputDir):
     # store files creation date
     tempTime = 0
     # output Filename
-    outfilename = os.path.join(_dataDir, _tempFileName)
+    outfilename = os.path.join(_outputDir, _tempFileName)
     # open all .htm files and merge them to the outfilename
     with open(outfilename, 'wb') as outfile:
         for filename in os.listdir(_dataDir):
@@ -152,35 +152,48 @@ def btn_start():
     if tempLehrerHeute != "":
         #create Timestamp file
         createTimeStampFile()
+        # create data folder for result
+        outputDir = os.path.join(tempLehrerHeute, 'data')
+        if not os.path.exists(outputDir):
+            os.makedirs(outputDir)
         # 1. merge all subst_00x files
-        mergeFiles(tempLehrerHeute, "LehrerAllHeute.html")
+        mergeFiles(tempLehrerHeute, "LehrerAllHeute.html", outputDir)
         # 2. delete all not needed HTML and add new id´s
         tempParse1 = myHtmlParser()
-        updateTextArea(tempParse1.cleanHTML(tempLehrerHeute, "LehrerAllHeute.html"), "")
+        updateTextArea(tempParse1.cleanHTML(outputDir, "LehrerAllHeute.html"), "")
         # 3. upload the HTML file to the server in a new thread
         tempFtp1 = myFtpUploader(tempServer, tempUsername, tempPassword)
-        updateTextArea(tempFtp1.uploadHTML(tempLehrerHeute, "/data/Lehrer_heute/", "LehrerAllHeute.html"), "RED")
+        updateTextArea(tempFtp1.uploadHTML(outputDir, "/data/Lehrer_heute", "LehrerAllHeute.html"), "RED")
 
     if tempLehrerMorgen != "":
-        mergeFiles(tempLehrerMorgen, "LehrerAllMorgen.html")
+        outputDir = os.path.join(tempLehrerMorgen, 'data')
+        if not os.path.exists(outputDir):
+            os.makedirs(outputDir)
+        mergeFiles(tempLehrerMorgen, "LehrerAllMorgen.html", outputDir)
         tempParse2 = myHtmlParser()
-        updateTextArea(tempParse2.cleanHTML(tempLehrerMorgen, "LehrerAllMorgen.html"), "")
+        updateTextArea(tempParse2.cleanHTML(outputDir, "LehrerAllMorgen.html"), "")
         tempFtp2 = myFtpUploader(tempServer, tempUsername, tempPassword)
-        updateTextArea(tempFtp2.uploadHTML(tempLehrerMorgen, "/data/Lehrer_morgen/", "LehrerAllMorgen.html"), "RED")
+        updateTextArea(tempFtp2.uploadHTML(outputDir, "/data/Lehrer_morgen/", "LehrerAllMorgen.html"), "RED")
 
     if tempSchuelerHeute != "":
-        mergeFiles(tempSchuelerHeute, "SchuelerAllHeute.html")
+        outputDir = os.path.join(tempSchuelerHeute, 'data')
+        if not os.path.exists(outputDir):
+            os.makedirs(outputDir)
+        mergeFiles(tempSchuelerHeute, "SchuelerAllHeute.html", outputDir)
         tempParse3 = myHtmlParser()
-        updateTextArea(tempParse3.cleanHTML(tempSchuelerHeute, "SchuelerAllHeute.html"), "")
+        updateTextArea(tempParse3.cleanHTML(outputDir, "SchuelerAllHeute.html"), "")
         tempFtp3 = myFtpUploader(tempServer, tempUsername, tempPassword)
-        updateTextArea(tempFtp3.uploadHTML(tempSchuelerHeute, "/data/Schueler_heute/", "SchuelerAllHeute.html"), "RED")
+        updateTextArea(tempFtp3.uploadHTML(outputDir, "/data/Schueler_heute/", "SchuelerAllHeute.html"), "RED")
 
     if tempSchuelerMorgen != "":
-        mergeFiles(tempSchuelerMorgen, "SchuelerAllMorgen.html")
+        outputDir = os.path.join(tempSchuelerMorgen, 'data')
+        if not os.path.exists(outputDir):
+            os.makedirs(outputDir)
+        mergeFiles(tempSchuelerMorgen, "SchuelerAllMorgen.html", outputDir)
         tempParse4 = myHtmlParser()
-        updateTextArea(tempParse4.cleanHTML(tempSchuelerMorgen, "SchuelerAllMorgen.html"), "")
+        updateTextArea(tempParse4.cleanHTML(outputDir, "SchuelerAllMorgen.html"), "")
         tempFtp4 = myFtpUploader(tempServer, tempUsername, tempPassword)
-        updateTextArea(tempFtp4.uploadHTML(tempSchuelerMorgen, "/data/Schueler_morgen/", "SchuelerAllMorgen.html"), "RED")
+        updateTextArea(tempFtp4.uploadHTML(outputDir, "/data/Schueler_morgen/", "SchuelerAllMorgen.html"), "RED")
 
     updateTextArea("-----------------------------------------------------------\n-> program finished!", "GREEN")
 
@@ -205,11 +218,11 @@ def updateTextArea(tempMessage, tempColor):
 
 # Function: create and upload Timestamp text file
 def createTimeStampFile():
-    file = open(os.path.join(tempLehrerHeute, "timeStamp.txt"), "w")
+    file = open(os.path.join(tempLehrerHeute, "data", "timeStamp.txt"), "w")
     file.write(time.strftime("%d.%m.%Y um %H:%M"))
     file.close()
     tempFtp = myFtpUploader(tempServer, tempUsername, tempPassword)
-    updateTextArea(tempFtp.uploadHTML(tempLehrerHeute, "/data/", "timeStamp.txt"), "RED")
+    updateTextArea(tempFtp.uploadHTML(os.path.join(tempLehrerHeute, "data"), "/data/", "timeStamp.txt"), "RED")
 
 # Function: open config file with specified program (windows only?!?)
 def openConfig():
@@ -220,7 +233,7 @@ def openConfig():
 # gui with appJar -> at the end of file
 #
 root = Tk()
-root.wm_title("Untis Vertretungsplan Parser - Version 1.3")
+root.wm_title("Untis Vertretungsplan Parser - Version 1.4")
 root.resizable(False, False)
 
 appHighlightFont = font.Font(family='Helvetica', size=12, weight='normal')
