@@ -150,12 +150,12 @@ def btn_start():
     text1.delete(1.0, END)
 
     if tempLehrerHeute != "":
-        #create Timestamp file
-        createTimeStampFile()
         # create data folder for result
         outputDir = os.path.join(tempLehrerHeute, 'data')
         if not os.path.exists(outputDir):
             os.makedirs(outputDir)
+        #create Timestamp file
+        createTimeStampFile()
         # 1. merge all subst_00x files
         mergeFiles(tempLehrerHeute, "LehrerAllHeute.html", outputDir)
         # 2. delete all not needed HTML and add new id´s
