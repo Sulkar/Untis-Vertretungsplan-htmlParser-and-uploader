@@ -8,7 +8,6 @@ from bs4 import BeautifulSoup
 # Class START
 class myHtmlParser:
 
-
     def __init__(self):
         pass
 
@@ -31,27 +30,20 @@ class myHtmlParser:
         for z in removeMonHead2nd:
             z.extract()
 
-        # find footer (2 <p> after each day -> Braumandl and Untis Link)and remove it
+        # find footer (2 x <p> after each day -> Untis Username and Untis Link)and remove it
         tempFooter = soup.find_all("table", class_="mon_list")
         for x in tempFooter:
             x.findNext("p").extract()
             x.findNext("p").extract()
 
-        # find <body> tags and rename them to <div id="tempDay"> if they are not empty
+        # find <body> tags and rename them to <div id="tempDay">
         tempBody = soup.find_all("body")
         for w in tempBody:
-            tempEmpty = w.select('td.list.inline_header') # search for td with both classes
-            for empty in tempEmpty:
-                if empty.find(text=re.compile("-----")) and len(tempEmpty) == 1: # if text in this td is ------ and it is the only td.list.inline_header -> do not rename body
-                    print("empty day not renaming -> delete it")
-                    w.extract() # remove empty days/body
-                else:
-                    w.name = "div"
-                    w["id"] = "tempDay"
+            w.name = "div"
+            w["id"] = "tempDay"
 
         # save changed html to file
         # prettify("utf-8") or unicode(soup) for normal formatting
-        #html_2 = soup.prettify("utf-8")
         html_2 = str(soup).encode("utf-8")
         with open(os.path.join(_directory, _tempFileName), "wb") as file:
             file.write(html_2)
