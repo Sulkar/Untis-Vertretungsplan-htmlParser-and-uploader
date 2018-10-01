@@ -1,5 +1,5 @@
 #
-# Vertretungsplan merger - htmlParser - ftpUploader - Version 1.4
+# Vertretungsplan merger - htmlParser - ftpUploader - Version 1.5
 #
 
 import shutil, os, sys, time
@@ -99,16 +99,17 @@ def mergeFiles(_dataDir, _tempFileName, _outputDir):
                 if tempFileName == outfilename:
                     # don't want to copy the output into the output
                     continue
-                # check creation time of the file (minutes) and merge only files created at the "same" time
-                tempCreateTime = os.path.getctime(tempFileName)
-                tempCreateMin = int(time.strftime("%M", time.gmtime(tempCreateTime)))
+                # check creation time of the file (seconds) and merge only files created at the "same" time
+                tempModifyTime = int(os.path.getmtime(tempFileName))
+                tempCreateTime = int(os.path.getctime(tempFileName))
                 if tempTime == 0:
-                    tempTime = tempCreateMin
-                    print("init tempTime with " + tempFileName)
-                elif tempCreateMin == tempTime or tempCreateMin == tempTime + 1: # if file has the same time or same time +1 -> merge
-                    print("merge " + tempFileName)
+                    tempTime = tempModifyTime
+                    print("\n")
+                    print("INIT  " + tempFileName + " - Modify Time: " + str(tempModifyTime) + " Creation Time: " + str(tempCreateTime))
+                elif tempTime - 60 <=  tempModifyTime <= tempTime + 60: # if file has the same time or same time +- 60 seconds -> merge
+                    print("MERGE " + tempFileName + " - Modify Time: " + str(tempModifyTime) + " Creation Time: " + str(tempCreateTime))
                 else:
-                    print("no merge " + tempFileName)
+                    print("NO MERGE " + tempFileName + " - Modify Time: " + str(tempModifyTime) + " Creation Time: " + str(tempCreateTime))
                     continue
 
                 with open(tempFileName, 'rb') as readfile:
@@ -233,7 +234,7 @@ def openConfig():
 # gui with appJar -> at the end of file
 #
 root = Tk()
-root.wm_title("Untis Vertretungsplan Parser - Version 1.4")
+root.wm_title("Untis Vertretungsplan Parser - Version 1.5")
 root.resizable(False, False)
 
 appHighlightFont = font.Font(family='Helvetica', size=12, weight='normal')
