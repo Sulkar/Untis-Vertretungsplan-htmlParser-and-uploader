@@ -1,5 +1,5 @@
 #
-# Vertretungsplan merger - htmlParser - ftpUploader - Version 1.5
+# Vertretungsplan merger - htmlParser - ftpUploader - Version 1.6
 #
 
 import shutil, os, sys, time
@@ -23,6 +23,9 @@ tempPassword = ""
 configFilename = "vertretungsplan.conf"
 tempResult = ""
 thisResult = ""
+tempType = "" #ftp or local
+localDir = "" #path to folder where to save the output
+
 
 #
 # defs / functions
@@ -43,8 +46,16 @@ def writeConf(_fieldNr, _tempDir):
 
 # Functions: read Config file
 def readConf():
-    global tempServer, tempUsername, tempPassword, tempLehrerHeute, tempLehrerMorgen, tempSchuelerHeute, tempSchuelerMorgen
+    global tempServer, tempUsername, tempPassword, tempLehrerHeute, tempLehrerMorgen, tempSchuelerHeute, tempSchuelerMorgen, tempType, localDir
     config = ConfigObj(configFilename)
+    try: # check if type is specified
+        tempType = config['type']
+    except:
+        print("no type specified")
+    try: # check localDir is specified
+        localDir = config['localDir']
+    except:
+        print("no localDir specified")
     try:  # check if value Servername exists
         tempServer = config['server']
         tempUsername = config['username']
@@ -162,9 +173,16 @@ def btn_start():
         # 2. delete all not needed HTML and add new id´s
         tempParse1 = myHtmlParser()
         updateTextArea(tempParse1.cleanHTML(outputDir, "LehrerAllHeute.html"), "")
-        # 3. upload the HTML file to the server in a new thread
-        tempFtp1 = myFtpUploader(tempServer, tempUsername, tempPassword)
-        updateTextArea(tempFtp1.uploadHTML(outputDir, "/data/Lehrer_heute", "LehrerAllHeute.html"), "RED")
+        # 3. upload the HTML file to the server in a new thread or copy files to network path
+        if tempType == "ftp":
+            tempFtp1 = myFtpUploader(tempServer, tempUsername, tempPassword)
+            updateTextArea(tempFtp1.uploadHTML(outputDir, "/data/Lehrer_heute", "LehrerAllHeute.html"), "RED")
+        elif tempType == "local":
+            tempLocalDir = os.path.join(localDir, 'Lehrer_heute/')
+            if not os.path.exists(tempLocalDir):
+                os.makedirs(tempLocalDir)
+            shutil.copy(os.path.join(outputDir, 'LehrerAllHeute.html'), tempLocalDir)
+
 
     if tempLehrerMorgen != "":
         outputDir = os.path.join(tempLehrerMorgen, 'data')
@@ -173,8 +191,14 @@ def btn_start():
         mergeFiles(tempLehrerMorgen, "LehrerAllMorgen.html", outputDir)
         tempParse2 = myHtmlParser()
         updateTextArea(tempParse2.cleanHTML(outputDir, "LehrerAllMorgen.html"), "")
-        tempFtp2 = myFtpUploader(tempServer, tempUsername, tempPassword)
-        updateTextArea(tempFtp2.uploadHTML(outputDir, "/data/Lehrer_morgen/", "LehrerAllMorgen.html"), "RED")
+        if tempType == "ftp":
+            tempFtp2 = myFtpUploader(tempServer, tempUsername, tempPassword)
+            updateTextArea(tempFtp2.uploadHTML(outputDir, "/data/Lehrer_morgen/", "LehrerAllMorgen.html"), "RED")
+        elif tempType == "local":
+            tempLocalDir = os.path.join(localDir, 'Lehrer_morgen/')
+            if not os.path.exists(tempLocalDir):
+                os.makedirs(tempLocalDir)
+            shutil.copy(os.path.join(outputDir, 'LehrerAllMorgen.html'), tempLocalDir)
 
     if tempSchuelerHeute != "":
         outputDir = os.path.join(tempSchuelerHeute, 'data')
@@ -183,8 +207,14 @@ def btn_start():
         mergeFiles(tempSchuelerHeute, "SchuelerAllHeute.html", outputDir)
         tempParse3 = myHtmlParser()
         updateTextArea(tempParse3.cleanHTML(outputDir, "SchuelerAllHeute.html"), "")
-        tempFtp3 = myFtpUploader(tempServer, tempUsername, tempPassword)
-        updateTextArea(tempFtp3.uploadHTML(outputDir, "/data/Schueler_heute/", "SchuelerAllHeute.html"), "RED")
+        if tempType == "ftp":
+            tempFtp3 = myFtpUploader(tempServer, tempUsername, tempPassword)
+            updateTextArea(tempFtp3.uploadHTML(outputDir, "/data/Schueler_heute/", "SchuelerAllHeute.html"), "RED")
+        elif tempType == "local":
+            tempLocalDir = os.path.join(localDir, 'Schueler_heute/')
+            if not os.path.exists(tempLocalDir):
+                os.makedirs(tempLocalDir)
+            shutil.copy(os.path.join(outputDir, 'SchuelerAllHeute.html'), tempLocalDir)
 
     if tempSchuelerMorgen != "":
         outputDir = os.path.join(tempSchuelerMorgen, 'data')
@@ -193,8 +223,14 @@ def btn_start():
         mergeFiles(tempSchuelerMorgen, "SchuelerAllMorgen.html", outputDir)
         tempParse4 = myHtmlParser()
         updateTextArea(tempParse4.cleanHTML(outputDir, "SchuelerAllMorgen.html"), "")
-        tempFtp4 = myFtpUploader(tempServer, tempUsername, tempPassword)
-        updateTextArea(tempFtp4.uploadHTML(outputDir, "/data/Schueler_morgen/", "SchuelerAllMorgen.html"), "RED")
+        if tempType == "ftp":
+            tempFtp4 = myFtpUploader(tempServer, tempUsername, tempPassword)
+            updateTextArea(tempFtp4.uploadHTML(outputDir, "/data/Schueler_morgen/", "SchuelerAllMorgen.html"), "RED")
+        elif tempType == "local":
+            tempLocalDir = os.path.join(localDir, 'Schueler_morgen/')
+            if not os.path.exists(tempLocalDir):
+                os.makedirs(tempLocalDir)
+            shutil.copy(os.path.join(outputDir, 'SchuelerAllMorgen.html'), tempLocalDir)
 
     updateTextArea("-----------------------------------------------------------\n-> program finished!", "GREEN")
 
@@ -219,11 +255,19 @@ def updateTextArea(tempMessage, tempColor):
 
 # Function: create and upload Timestamp text file
 def createTimeStampFile():
-    file = open(os.path.join(tempLehrerHeute, "data", "timeStamp.txt"), "w")
+    outputDir = os.path.join(tempLehrerHeute, 'data')
+    file = open(os.path.join(outputDir, "timeStamp.txt"), "w")
     file.write(time.strftime("%d.%m.%Y um %H:%M"))
     file.close()
-    tempFtp = myFtpUploader(tempServer, tempUsername, tempPassword)
-    updateTextArea(tempFtp.uploadHTML(os.path.join(tempLehrerHeute, "data"), "/data/", "timeStamp.txt"), "RED")
+    if tempType == "ftp":
+        tempFtp = myFtpUploader(tempServer, tempUsername, tempPassword)
+        updateTextArea(tempFtp.uploadHTML(outputDir, "/data/", "timeStamp.txt"), "RED")
+    elif tempType == "local":
+        tempLocalDir = localDir
+        if not os.path.exists(tempLocalDir):
+            os.makedirs(tempLocalDir)
+        shutil.copy(os.path.join(outputDir, 'timeStamp.txt'), tempLocalDir)
+
 
 # Function: open config file with specified program (windows only?!?)
 def openConfig():
@@ -234,7 +278,7 @@ def openConfig():
 # gui with appJar -> at the end of file
 #
 root = Tk()
-root.wm_title("Untis Vertretungsplan Parser - Version 1.5")
+root.wm_title("Untis Vertretungsplan Parser - Version 1.6")
 root.resizable(False, False)
 
 appHighlightFont = font.Font(family='Helvetica', size=12, weight='normal')
